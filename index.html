@@ -365,11 +365,13 @@
                 <table id="detalhes-table">
                     <thead>
                         <tr>
+                            <th>Pos</th>
                             <th>Nome</th>
                             <th>Vendas</th>
                             <th>Atend.</th>
                             <th>Power</th>
                             <th>Conv.</th>
+                            <th>Calidad</th>
                         </tr>
                     </thead>
                     <tbody></tbody>
@@ -564,14 +566,23 @@
             const tbody = document.querySelector('#detalhes-table tbody');
             tbody.innerHTML = '';
 
-            vendedoras.forEach(function(v) {
+            // Ordenar por Power (maior para menor)
+            const sorted = vendedoras.slice().sort(function(a, b) { 
+                return (b.power || 0) - (a.power || 0); 
+            });
+            
+            const medals = ['🥇', '🥈', '🥉', '4️⃣', '5️⃣', '6️⃣'];
+
+            sorted.forEach(function(v, i) {
                 tbody.innerHTML += 
                     '<tr>' +
+                    '<td><span class="medal">' + (medals[i] || (i + 1)) + '</span></td>' +
                     '<td><strong>' + v.nome + '</strong></td>' +
                     '<td>' + v.vendas + '</td>' +
                     '<td>' + v.atendimentos + '</td>' +
                     '<td>' + (v.power || 0) + '%</td>' +
                     '<td>' + (v.conversion || 0) + '%</td>' +
+                    '<td>' + (v.calidad || 0) + '%</td>' +
                     '</tr>';
             });
         }
