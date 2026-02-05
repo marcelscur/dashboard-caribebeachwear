@@ -1,0 +1,574 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>Dashboard Caribe Beach Wear</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        html, body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #1e1e2e 0%, #2d2d44 100%);
+            color: #fff;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        body {
+            padding: 15px;
+            padding-bottom: 50px;
+        }
+
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 20px;
+            padding: 20px 15px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+        }
+
+        h1 {
+            font-size: 1.8em;
+            margin-bottom: 8px;
+            background: linear-gradient(45deg, #00d4ff, #00ff88);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .subtitle {
+            color: #aaa;
+            font-size: 0.9em;
+        }
+
+        .config-panel {
+            background: rgba(255, 193, 7, 0.1);
+            border: 2px solid rgba(255, 193, 7, 0.3);
+            border-radius: 10px;
+            padding: 15px;
+            margin: 15px 0;
+        }
+
+        .config-panel input {
+            width: 100%;
+            padding: 12px;
+            margin: 10px 0;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            color: #fff;
+            font-size: 16px; /* iOS mínimo para não dar zoom */
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-size: 0.85em;
+            margin-top: 10px;
+        }
+
+        .badge-success { background: rgba(0, 255, 136, 0.2); color: #00ff88; }
+        .badge-warning { background: rgba(255, 193, 7, 0.2); color: #ffc107; }
+        .badge-danger { background: rgba(255, 82, 82, 0.2); color: #ff5252; }
+        .badge-info { background: rgba(0, 212, 255, 0.2); color: #00d4ff; }
+
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 12px;
+            padding: 15px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: transform 0.2s ease;
+        }
+
+        .card:active {
+            transform: scale(0.98);
+        }
+
+        .card-title {
+            font-size: 0.75em;
+            color: #aaa;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 8px;
+        }
+
+        .card-value {
+            font-size: 1.8em;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .card-subtitle {
+            font-size: 0.8em;
+            color: #888;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 6px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 3px;
+            overflow: hidden;
+            margin-top: 10px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #00d4ff, #00ff88);
+            transition: width 0.5s ease;
+            border-radius: 3px;
+        }
+
+        .chart-container {
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 20px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .chart-title {
+            font-size: 1.1em;
+            margin-bottom: 15px;
+            color: #00d4ff;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            overflow: hidden;
+            font-size: 0.85em;
+        }
+
+        th {
+            background: rgba(0, 212, 255, 0.2);
+            padding: 10px 8px;
+            text-align: left;
+            font-weight: 600;
+            color: #00d4ff;
+            font-size: 0.9em;
+        }
+
+        td {
+            padding: 10px 8px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        tr:active {
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 15px;
+            font-size: 0.8em;
+            font-weight: 600;
+        }
+
+        .medal {
+            font-size: 1.3em;
+            margin-right: 5px;
+        }
+
+        .btn {
+            background: linear-gradient(45deg, #00d4ff, #00ff88);
+            border: none;
+            padding: 12px 25px;
+            border-radius: 25px;
+            color: #1e1e2e;
+            font-weight: bold;
+            cursor: pointer;
+            font-size: 0.95em;
+            margin: 8px 5px;
+            display: inline-block;
+            text-decoration: none;
+            transition: transform 0.2s ease;
+            -webkit-appearance: none;
+            touch-action: manipulation;
+        }
+
+        .btn:active {
+            transform: scale(0.95);
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.1);
+            color: #fff;
+        }
+
+        .last-update {
+            font-size: 0.8em;
+            color: #888;
+            margin-top: 8px;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px 20px;
+            font-size: 1.1em;
+            color: #00d4ff;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .loading {
+            animation: pulse 1.5s infinite;
+        }
+
+        /* Melhor visualização mobile */
+        @media (max-width: 768px) {
+            h1 { font-size: 1.5em; }
+            .card-value { font-size: 1.5em; }
+            
+            table {
+                display: block;
+                overflow-x: auto;
+                -webkit-overflow-scrolling: touch;
+            }
+            
+            .chart-container canvas {
+                max-height: 250px;
+            }
+        }
+
+        /* Fix para iOS */
+        input, button, select, textarea {
+            -webkit-appearance: none;
+            appearance: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🏖️ Caribe Beach Wear</h1>
+            <p class="subtitle">Dashboard Gerencial</p>
+            <div style="margin-top: 15px;">
+                <button class="btn" type="button" id="btn-refresh">🔄 Atualizar</button>
+                <button class="btn btn-secondary" type="button" id="btn-config">⚙️ Config</button>
+            </div>
+            <div id="data-source" class="status-badge badge-warning">
+                ⚙️ Configure primeiro
+            </div>
+            <div class="last-update" id="last-update">
+                Aguardando...
+            </div>
+        </header>
+
+        <div id="config-panel" class="config-panel">
+            <h3 style="color: #ffc107; margin-bottom: 10px; font-size: 1.1em;">⚙️ URL da API</h3>
+            <p style="font-size: 0.85em; color: #aaa; margin-bottom: 10px;">
+                Cole a URL do Google Apps Script
+            </p>
+            <input type="url" id="api-url" placeholder="https://script.google.com/..." autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" />
+            <button class="btn" type="button" id="btn-save">💾 Salvar</button>
+        </div>
+
+        <div id="loading" class="loading hidden">
+            Carregando...
+        </div>
+
+        <div id="dashboard" class="hidden">
+            <!-- Cards resumo -->
+            <div class="dashboard-grid">
+                <div class="card">
+                    <div class="card-title">💰 Vendas</div>
+                    <div class="card-value" id="vendas-total">0</div>
+                    <div class="card-subtitle">Meta: <span id="meta-total">0</span></div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="progress-vendas" style="width: 0%"></div>
+                    </div>
+                    <div class="card-subtitle" style="margin-top: 8px;">
+                        <span id="percentual-vendas">0%</span>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-title">📞 Atendimentos</div>
+                    <div class="card-value" id="atendimentos-total">0</div>
+                </div>
+
+                <div class="card">
+                    <div class="card-title">🎯 Conversão</div>
+                    <div class="card-value" id="conversao-total">0%</div>
+                </div>
+
+                <div class="card">
+                    <div class="card-title">📈 Projeção</div>
+                    <div class="card-value" id="projecao-semanal">0</div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="progress-projecao" style="width: 0%"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Gráfico vendas -->
+            <div class="chart-container">
+                <div class="chart-title">📊 Vendas X Meta</div>
+                <canvas id="vendasChart"></canvas>
+            </div>
+
+            <!-- Ranking -->
+            <div class="chart-container">
+                <div class="chart-title">🏆 Ranking</div>
+                <table id="ranking-table">
+                    <thead>
+                        <tr>
+                            <th>Pos</th>
+                            <th>Nome</th>
+                            <th>Vendas</th>
+                            <th>%</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+
+            <!-- Detalhes -->
+            <div class="chart-container">
+                <div class="chart-title">👥 Performance</div>
+                <table id="detalhes-table">
+                    <thead>
+                        <tr>
+                            <th>Nome</th>
+                            <th>Vendas</th>
+                            <th>Atend.</th>
+                            <th>Conv.</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let vendasChart = null;
+        let autoRefreshInterval = null;
+
+        // Event listeners com touch events para iOS
+        document.getElementById('btn-refresh').addEventListener('click', function(e) {
+            e.preventDefault();
+            loadData();
+        }, false);
+
+        document.getElementById('btn-config').addEventListener('click', function(e) {
+            e.preventDefault();
+            toggleConfig();
+        }, false);
+
+        document.getElementById('btn-save').addEventListener('click', function(e) {
+            e.preventDefault();
+            saveApiUrl();
+        }, false);
+
+        function toggleConfig() {
+            const panel = document.getElementById('config-panel');
+            panel.classList.toggle('hidden');
+        }
+
+        function saveApiUrl() {
+            const url = document.getElementById('api-url').value.trim();
+            if (url) {
+                localStorage.setItem('dashboard_api_url', url);
+                toggleConfig();
+                loadData();
+            } else {
+                alert('❌ Insira uma URL válida');
+            }
+        }
+
+        async function loadData() {
+            const apiUrl = localStorage.getItem('dashboard_api_url');
+            
+            if (!apiUrl) {
+                alert('⚠️ Configure a URL primeiro');
+                document.getElementById('config-panel').classList.remove('hidden');
+                return;
+            }
+
+            try {
+                document.getElementById('loading').classList.remove('hidden');
+                document.getElementById('dashboard').classList.add('hidden');
+                updateStatus('Carregando...', 'info');
+                
+                const response = await fetch(apiUrl);
+                if (!response.ok) throw new Error('Erro HTTP ' + response.status);
+                
+                const data = await response.json();
+                if (data.status === 'error') throw new Error(data.message);
+                
+                processData(data);
+                
+                const now = new Date();
+                document.getElementById('last-update').textContent = 'Atualizado: ' + now.toLocaleTimeString('pt-BR');
+                updateStatus('✅ Atualizado', 'success');
+                
+                document.getElementById('loading').classList.add('hidden');
+                document.getElementById('dashboard').classList.remove('hidden');
+                
+            } catch (error) {
+                console.error('Erro:', error);
+                updateStatus('❌ Erro', 'danger');
+                document.getElementById('loading').innerHTML = 
+                    '<div style="padding: 20px; background: rgba(255,82,82,0.1); border-radius: 12px;">' +
+                    '<h3 style="color: #ff5252; margin-bottom: 10px;">❌ Erro</h3>' +
+                    '<p style="color: #aaa; font-size: 0.9em;">' + error.message + '</p>' +
+                    '<button class="btn" style="margin-top: 15px;" onclick="loadData()">🔄 Tentar</button>' +
+                    '</div>';
+            }
+        }
+
+        function updateStatus(message, type) {
+            const badge = document.getElementById('data-source');
+            badge.textContent = message;
+            badge.className = 'status-badge badge-' + type;
+        }
+
+        function processData(data) {
+            const vendedoras = data.vendedoras.map(function(v) { return v.nome; });
+            const vendas = data.vendedoras.map(function(v) { return v.vendas; });
+            const metas = data.vendedoras.map(function(v) { return v.meta; });
+
+            // Atualizar cards
+            document.getElementById('vendas-total').textContent = data.totais.vendas;
+            document.getElementById('meta-total').textContent = data.totais.meta;
+            document.getElementById('percentual-vendas').textContent = data.totais.percentual + '%';
+            document.getElementById('progress-vendas').style.width = Math.min(data.totais.percentual, 100) + '%';
+
+            document.getElementById('atendimentos-total').textContent = data.totais.atendimentos;
+            document.getElementById('conversao-total').textContent = data.totais.conversion + '%';
+            
+            const projecao = Math.round((data.totais.vendas / 3) * 7);
+            document.getElementById('projecao-semanal').textContent = projecao;
+            const percProj = ((projecao / data.totais.meta) * 100).toFixed(1);
+            document.getElementById('progress-projecao').style.width = Math.min(percProj, 100) + '%';
+
+            createVendasChart(vendedoras, vendas, metas);
+            createRankingTable(data.vendedoras);
+            createDetalhesTable(data.vendedoras);
+        }
+
+        function createVendasChart(vendedoras, vendas, metas) {
+            const ctx = document.getElementById('vendasChart');
+            if (!ctx) return;
+            
+            if (vendasChart) vendasChart.destroy();
+
+            vendasChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: vendedoras,
+                    datasets: [{
+                        label: 'Vendas',
+                        data: vendas,
+                        backgroundColor: 'rgba(0, 212, 255, 0.6)',
+                        borderColor: 'rgba(0, 212, 255, 1)',
+                        borderWidth: 2
+                    }, {
+                        label: 'Meta',
+                        data: metas,
+                        backgroundColor: 'rgba(0, 255, 136, 0.3)',
+                        borderColor: 'rgba(0, 255, 136, 1)',
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    plugins: { legend: { labels: { color: '#fff' } } },
+                    scales: {
+                        y: { beginAtZero: true, ticks: { color: '#fff' }, grid: { color: 'rgba(255,255,255,0.1)' } },
+                        x: { ticks: { color: '#fff' }, grid: { color: 'rgba(255,255,255,0.1)' } }
+                    }
+                }
+            });
+        }
+
+        function createRankingTable(vendedoras) {
+            const tbody = document.querySelector('#ranking-table tbody');
+            tbody.innerHTML = '';
+
+            const sorted = vendedoras.slice().sort(function(a, b) { return b.vendas - a.vendas; });
+            const medals = ['🥇', '🥈', '🥉', '4️⃣', '5️⃣', '6️⃣'];
+
+            sorted.forEach(function(v, i) {
+                const perc = v.meta > 0 ? ((v.vendas / v.meta) * 100).toFixed(1) : 0;
+                tbody.innerHTML += 
+                    '<tr>' +
+                    '<td><span class="medal">' + (medals[i] || (i + 1)) + '</span></td>' +
+                    '<td><strong>' + v.nome + '</strong></td>' +
+                    '<td>' + v.vendas + '</td>' +
+                    '<td>' + perc + '%</td>' +
+                    '</tr>';
+            });
+        }
+
+        function createDetalhesTable(vendedoras) {
+            const tbody = document.querySelector('#detalhes-table tbody');
+            tbody.innerHTML = '';
+
+            vendedoras.forEach(function(v) {
+                tbody.innerHTML += 
+                    '<tr>' +
+                    '<td><strong>' + v.nome + '</strong></td>' +
+                    '<td>' + v.vendas + '</td>' +
+                    '<td>' + v.atendimentos + '</td>' +
+                    '<td>' + v.conversion + '%</td>' +
+                    '</tr>';
+            });
+        }
+
+        // Auto-carregar se já configurado
+        window.addEventListener('load', function() {
+            const apiUrl = localStorage.getItem('dashboard_api_url');
+            if (apiUrl) {
+                loadData();
+                autoRefreshInterval = setInterval(loadData, 600000); // 10 min
+            } else {
+                document.getElementById('config-panel').classList.remove('hidden');
+            }
+        });
+
+        // Limpar ao fechar
+        window.addEventListener('beforeunload', function() {
+            if (autoRefreshInterval) clearInterval(autoRefreshInterval);
+        });
+    </script>
+</body>
+</html>
